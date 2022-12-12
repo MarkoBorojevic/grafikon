@@ -44,6 +44,36 @@ function DrawGraph()
     }
 
     ctx.stroke();
+
+    var prevX = -100000000;
+    for(let xNum = -ctx.canvas.width / 2; xNum < ctx.canvas.width / 2; xNum++) {
+        if((xNum * scale) > prevX + 100) {
+            var textCoords = ConvertCoordinates(xNum * scale, -18, ctx.canvas.width, ctx.canvas.height);
+
+            console.log(textCoords);
+
+            ctx.font = "18px serif";
+            ctx.textAlign = 'center';
+            ctx.fillText((xNum).toString(), textCoords.x, textCoords.y);
+
+            prevX = xNum * scale;
+        }
+    }
+
+    var prevY = -100000000;
+    for(let yNum = -ctx.canvas.height / 2; yNum < ctx.canvas.height / 2; yNum++) {
+        if((yNum * scale) > prevY + 100) {
+            var textCoords = ConvertCoordinates(-5, yNum * scale, ctx.canvas.width, ctx.canvas.height);
+            
+            console.log(textCoords);
+
+            ctx.font = "18px serif";
+            ctx.textAlign = 'center';
+            ctx.fillText((yNum).toString(), textCoords.x, textCoords.y);
+
+            prevY = yNum * scale;
+        }
+    }
 }
 
 function ConvertCoordinates(x, y, width, height) {
