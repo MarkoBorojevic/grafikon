@@ -75,5 +75,5 @@ function UpdateScale() {
 window.addEventListener('resize', draw, false);
 
 ParseInput();
-
+UpdateScale();
 draw();
