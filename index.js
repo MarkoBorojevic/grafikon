@@ -36,8 +36,8 @@ function DrawGraph()
 
     for (let x = -ctx.canvas.width / 2; x < ctx.canvas.width / 2 - 1; x++) {
 
-        var coords = ConvertCoordinates(x, evaluate(x / scale), ctx.canvas.width, ctx.canvas.height);
-        var nextCoords = ConvertCoordinates(x+1, evaluate((x+1) / scale), ctx.canvas.width, ctx.canvas.height);
+        var coords = ConvertCoordinates(x, evaluate(x / scale) * scale, ctx.canvas.width, ctx.canvas.height);
+        var nextCoords = ConvertCoordinates(x+1, evaluate((x+1) / scale) * scale, ctx.canvas.width, ctx.canvas.height);
 
         ctx.moveTo(coords.x, coords.y);
         ctx.lineTo(nextCoords.x, nextCoords.y);
@@ -64,7 +64,7 @@ function DrawGraph()
     for(let yNum = -ctx.canvas.height / 2; yNum < ctx.canvas.height / 2; yNum++) {
         if((yNum * scale) > prevY + 100) {
             var textCoords = ConvertCoordinates(-5, yNum * scale, ctx.canvas.width, ctx.canvas.height);
-            
+
             console.log(textCoords);
 
             ctx.font = "18px serif";
