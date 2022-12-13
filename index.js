@@ -25,7 +25,9 @@ function DrawLines() {
     DrawLineNumbers(1000000, 0, (num) => num > -ctx.canvas.width / 2 - offset.x, -1, ctx, 1, 5)
 }
 
-function DrawLineNumbers(prev, numInit, condition, iterator, ctx, lineX, lineY) {
+function DrawLineNumbers(prevInit, numInit, condition, iterator, ctx, lineX, lineY) {
+    var prev = prevInit;
+
     for(let xNum = numInit; condition(xNum); xNum+=iterator) {
         var textCoords = ConvertCoordinates(xNum * scale, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -33,11 +35,28 @@ function DrawLineNumbers(prev, numInit, condition, iterator, ctx, lineX, lineY) 
 
         if((xNum * scale) > prev + MAX_NUMBER_GAP || (xNum * scale) < prev - MAX_NUMBER_GAP) 
         {
-            ctx.font = "18px Arial";
-            ctx.textAlign = 'center';
-            ctx.fillText((xNum).toString(), textCoords.x, textCoords.y+20);
-
+            if(Math.abs(xNum) > 0) {
+                ctx.font = "18px Arial";
+                ctx.textAlign = 'center';
+                ctx.fillText((xNum).toString(), textCoords.x, textCoords.y+20);
+            }
             prev = xNum * scale;
+        }
+    }
+
+    for(let yNum = numInit; condition(yNum); yNum+=iterator) {
+        var textCoords = ConvertCoordinates(0, yNum * scale, ctx.canvas.width, ctx.canvas.height);
+
+        ctx.fillRect(textCoords.x, textCoords.y, -lineY, lineX);
+
+        if((yNum * scale) > prev + MAX_NUMBER_GAP || (yNum * scale) < prev - MAX_NUMBER_GAP) 
+        {
+            if(Math.abs(yNum) > 0) {
+                ctx.font = "18px Arial";
+                ctx.textAlign = 'center';
+                ctx.fillText((yNum).toString(), textCoords.x-20, textCoords.y+5);
+            }
+            prev = yNum * scale;
         }
     }
 }
@@ -95,7 +114,7 @@ function ParseInput() {
 function UpdateScale(newScale) {
     scaleDelta = newScale - scale;
     
-    scale = clamp(newScale, 2, 200);
+    scale = clamp(newScale, 5, 300);
 
     DrawGraph();
 }
