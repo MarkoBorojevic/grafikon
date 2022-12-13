@@ -2,17 +2,21 @@
 <html>
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.0/math.min.js" type="text/javascript"></script>
-    <title>GRAFIKON</title>
+    <title>GRAFIKON | Marko Borojević</title>
+    <link rel="icon" type="image/x-icon" href="/assets/icon.png">
     <meta name="viewport" content="width=200, initial-scale=1">
     <link href="style.css" rel="stylesheet"/>
     <script defer src="index.js"></script>
   </head>
   <body>
     <h1>GRAFIKON</h1>
-    <canvas id="graphic" width="2000" height="500"></canvas>
+    <a style=" position: fixed; top: 0; right: 0; margin-right: 10px; margin-top: 15px;"href="https://markoborojevic.com">Made by Marko Borojević</a>
+    <canvas id="graphic"></canvas>
     <div class="graphSettings">
-      <input id="funcInput" style="font-size:14pt;" placeholder="Function..." oninput="ParseInput()" value="x*x*x">
-      <input type="range" style="width: 350px;" step = "0.01" id="scale" name="Scale" min="5" max="150.0" oninput="UpdateScale()" value="50">
+      <button onclick="location.href='https://mathjs.org/docs/expressions/syntax.html';">?</button>
+      <input id="funcInput" placeholder="Function..." oninput="ParseInput()" value="x*x*x">
+      <button onclick="zoomIn()">+</button>
+      <button onclick="zoomOut()">-</button>
     </div>
   </body>
 </html>

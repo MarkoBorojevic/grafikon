@@ -2,29 +2,55 @@
 let func = null;
 let scale = 1;
 
-function DrawLines() {
-    var c = document.getElementById("graphic");
-    var ctx = c.getContext("2d");
+let offset = { x: -50, y: 50 };
 
-    ctx.fillRect(ctx.canvas.width / 2, 0, 1, ctx.canvas.height);
-    ctx.fillRect(0, ctx.canvas.height / 2, ctx.canvas.width, 1);
+let canvas = document.getElementById("graphic");
+let ctx = canvas.getContext("2d");
+
+const MAX_NUMBER_GAP = 40;
+
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+function DrawLines() {
+    var horizontal = ConvertCoordinates(-ctx.canvas.width / 2, 0, ctx.canvas.width, ctx.canvas.height)
+    var vertical = ConvertCoordinates(0, ctx.canvas.height / 2, ctx.canvas.width, ctx.canvas.height)
+
+    ctx.fillRect(vertical.x, vertical.y -offset.y, 1, ctx.canvas.height);
+    ctx.fillRect(horizontal.x - offset.x, horizontal.y, ctx.canvas.width, 1);
+
+    // X Positive
+    DrawLineNumbers(-1000000, 0, (num) => num < ctx.canvas.width / 2 - offset.x, 1, ctx, 1, 5)
+    
+    // X Negative
+    DrawLineNumbers(1000000, 0, (num) => num > -ctx.canvas.width / 2 - offset.x, -1, ctx, 1, 5)
 }
 
-function draw() {
-    var c = document.getElementById("graphic");
-    var ctx = c.getContext("2d");
+function DrawLineNumbers(prev, numInit, condition, iterator, ctx, lineX, lineY) {
+    for(let xNum = numInit; condition(xNum); xNum+=iterator) {
+        var textCoords = ConvertCoordinates(xNum * scale, 0, ctx.canvas.width, ctx.canvas.height);
+
+        ctx.fillRect(textCoords.x, textCoords.y, lineX, lineY);
+
+        if((xNum * scale) > prev + MAX_NUMBER_GAP || (xNum * scale) < prev - MAX_NUMBER_GAP) 
+        {
+            ctx.font = "18px Arial";
+            ctx.textAlign = 'center';
+            ctx.fillText((xNum).toString(), textCoords.x, textCoords.y+20);
+
+            prev = xNum * scale;
+        }
+    }
+}
+
+function Draw() {
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight - 110;
-    //...drawing code...
 
     DrawGraph();
   }
 
 function DrawGraph()
 {
-    var c = document.getElementById("graphic");
-    var ctx = c.getContext("2d");
-
     ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
     
     DrawLines();
@@ -34,50 +60,20 @@ function DrawGraph()
 
     ctx.beginPath();
 
-    for (let x = -ctx.canvas.width / 2; x < ctx.canvas.width / 2 - 1; x++) {
+    for (let x = -ctx.canvas.width / 2 - offset.x; x < ctx.canvas.width / 2 - 1 - offset.x; x++) {
 
         var coords = ConvertCoordinates(x, evaluate(x / scale) * scale, ctx.canvas.width, ctx.canvas.height);
         var nextCoords = ConvertCoordinates(x+1, evaluate((x+1) / scale) * scale, ctx.canvas.width, ctx.canvas.height);
-
+        
         ctx.moveTo(coords.x, coords.y);
         ctx.lineTo(nextCoords.x, nextCoords.y);
     }
 
     ctx.stroke();
-
-    var prevX = -100000000;
-    for(let xNum = -ctx.canvas.width / 2; xNum < ctx.canvas.width / 2; xNum++) {
-        if((xNum * scale) > prevX + 100) {
-            var textCoords = ConvertCoordinates(xNum * scale, -18, ctx.canvas.width, ctx.canvas.height);
-
-            console.log(textCoords);
-
-            ctx.font = "18px serif";
-            ctx.textAlign = 'center';
-            ctx.fillText((xNum).toString(), textCoords.x, textCoords.y);
-
-            prevX = xNum * scale;
-        }
-    }
-
-    var prevY = -100000000;
-    for(let yNum = -ctx.canvas.height / 2; yNum < ctx.canvas.height / 2; yNum++) {
-        if((yNum * scale) > prevY + 100) {
-            var textCoords = ConvertCoordinates(-5, yNum * scale, ctx.canvas.width, ctx.canvas.height);
-
-            console.log(textCoords);
-
-            ctx.font = "18px serif";
-            ctx.textAlign = 'center';
-            ctx.fillText((yNum).toString(), textCoords.x, textCoords.y);
-
-            prevY = yNum * scale;
-        }
-    }
 }
 
 function ConvertCoordinates(x, y, width, height) {
- return { x: x + (width / 2), y: -y + (height / 2)}
+ return { x: x + (width / 2) + offset.x, y: -y + (height / 2) + offset.y}
 }
 
 function evaluate(xVal) {
@@ -96,14 +92,79 @@ function ParseInput() {
     DrawGraph();
 }
 
-function UpdateScale() {
-    scale = document.getElementById("scale").value;
+function UpdateScale(newScale) {
+    scaleDelta = newScale - scale;
+    
+    scale = clamp(newScale, 2, 200);
 
     DrawGraph();
 }
 
-window.addEventListener('resize', draw, false);
+window.addEventListener('resize', Draw, false);
+
+function getCanvasRelative(e) {
+    var canvas = e.target,
+    bx = canvas.getBoundingClientRect();
+    return {
+        x: (e.changedTouches ? e.changedTouches[0].clientX : e.clientX) - bx.left,
+        y: (e.changedTouches ? e.changedTouches[0].clientY : e.clientY) - bx.top
+    };
+};
+function distance (x1, y1, x2, y2) {
+    return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+}
+
+let pointerDown = false;
+function pointerDownEvent(e) {
+        pointerDown = true;
+}
+function pointerMoveEvent(e) {
+    if(pointerDown) {
+        offset.x += e.movementX;
+        offset.y += e.movementY;
+        DrawGraph();
+    }
+}
+function pointerUpEvent(e) {
+    pointerDown = false;
+};
+
+canvas.addEventListener('mousedown', pointerDownEvent);
+canvas.addEventListener('mousemove', pointerMoveEvent);
+canvas.addEventListener('mouseup', pointerUpEvent);
+canvas.addEventListener('touchstart', pointerDownEvent);
+canvas.addEventListener('touchmove', pointerMoveEvent);
+canvas.addEventListener('touchend', pointerUpEvent);
+
+function reset() {
+    offset.x = 0;
+    offset.y = 0;
+    UpdateScale(50);
+    DrawGraph();
+}
+
+let zoomInputMultiplier = 15;
+
+function zoomIn() {
+    UpdateScale(scale + zoomInputMultiplier);
+}
+
+function zoomOut() {
+    UpdateScale(scale - zoomInputMultiplier);
+}
+
+addEventListener('keydown', (event) => 
+{ 
+    if(event.key == "r") {
+        reset();
+    }
+});
+
+addEventListener('wheel', (event) => 
+{
+    UpdateScale(scale +=  (scale / -event.deltaY) * zoomInputMultiplier);
+});
 
 ParseInput();
-UpdateScale();
-draw();
+reset();
+Draw();
