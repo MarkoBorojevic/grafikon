@@ -135,8 +135,6 @@ function distance (x1, y1, x2, y2) {
 }
 
 function updateOffset(deltaX, deltaY) {
-    console.log(`${deltaX} ${deltaY}`);
-
     offset.x += deltaX;
     offset.y += deltaY;
 
