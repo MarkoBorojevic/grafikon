@@ -21,6 +21,7 @@ function DrawLines() {
     // X Positive
     DrawLineNumbers(-1000000, 0, (num) => num < ctx.canvas.width / 2 - offset.x, 1, ctx, 1, 5)
     
+    
     // X Negative
     DrawLineNumbers(1000000, 0, (num) => num > -ctx.canvas.width / 2 - offset.x, -1, ctx, 1, 5)
 }
@@ -133,28 +134,38 @@ function distance (x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }
 
+function updateOffset(deltaX, deltaY) {
+    console.log(`${deltaX} ${deltaY}`);
+
+    offset.x += deltaX;
+    offset.y += deltaY;
+
+    DrawGraph();
+}
+
 let pointerDown = false;
-function pointerDownEvent(e) {
-        pointerDown = true;
-}
-function pointerMoveEvent(e) {
-    if(pointerDown) {
-        offset.x += e.movementX;
-        offset.y += e.movementY;
-        DrawGraph();
-    }
-}
-function pointerUpEvent(e) {
-    pointerDown = false;
-};
+let touchOffset = { x:0, y:0};
 
-canvas.addEventListener('mousedown', pointerDownEvent);
-canvas.addEventListener('mousemove', pointerMoveEvent);
-canvas.addEventListener('mouseup', pointerUpEvent);
-canvas.addEventListener('touchstart', pointerDownEvent);
-canvas.addEventListener('touchmove', pointerMoveEvent);
-canvas.addEventListener('touchend', pointerUpEvent);
+canvas.addEventListener('mousedown', (e) => pointerDown = true);
+canvas.addEventListener('mouseup', (e) => pointerDown = false);
+canvas.addEventListener('mousemove', (e) => 
+{ 
+    if(pointerDown) updateOffset(e.movementX, e.movementY) 
+});
 
+canvas.addEventListener('touchstart', (e) => {
+    touchOffset = { x: e.touches[0].pageX, y: e.touches[0].pageY }
+});
+
+canvas.addEventListener('touchmove', (e) => 
+{
+    deltaX = touchOffset.x - e.touches[0].pageX;
+    deltaY = touchOffset.y - e.touches[0].pageY;
+
+    updateOffset(-deltaX, -deltaY);
+
+    touchOffset = { x: e.touches[0].pageX, y: e.touches[0].pageY }
+});
 function reset() {
     offset.x = 0;
     offset.y = 0;
