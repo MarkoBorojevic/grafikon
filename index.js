@@ -19,17 +19,17 @@ function DrawLines() {
     ctx.fillRect(horizontal.x - offset.x, horizontal.y, ctx.canvas.width, 1);
 
     // X Positive
-    DrawLineNumbers(-1000000, 0, (num) => num < ctx.canvas.width / 2 - offset.x, 1, ctx, 1, 5)
+    DrawLineNumbers(-1000000, 0, (num) => num < ctx.canvas.width / 2, 1, ctx, 1, 5)
     
     
     // X Negative
-    DrawLineNumbers(1000000, 0, (num) => num > -ctx.canvas.width / 2 - offset.x, -1, ctx, 1, 5)
+    DrawLineNumbers(1000000, 0, (num) => num > -ctx.canvas.width / 2, -1, ctx, 1, 5)
 }
 
 function DrawLineNumbers(prevInit, numInit, condition, iterator, ctx, lineX, lineY) {
     var prev = prevInit;
 
-    for(let xNum = numInit; condition(xNum); xNum+=iterator) {
+    for(let xNum = numInit; condition(xNum+ offset.x); xNum+=iterator) {
         var textCoords = ConvertCoordinates(xNum * scale, 0, ctx.canvas.width, ctx.canvas.height);
 
         ctx.fillRect(textCoords.x, textCoords.y, lineX, lineY);
@@ -45,7 +45,7 @@ function DrawLineNumbers(prevInit, numInit, condition, iterator, ctx, lineX, lin
         }
     }
 
-    for(let yNum = numInit; condition(yNum); yNum+=iterator) {
+    for(let yNum = numInit; condition(yNum- offset.y); yNum+=iterator) {
         var textCoords = ConvertCoordinates(0, yNum * scale, ctx.canvas.width, ctx.canvas.height);
 
         ctx.fillRect(textCoords.x, textCoords.y, -lineY, lineX);
